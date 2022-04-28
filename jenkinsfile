@@ -2,8 +2,8 @@ pipeline {
      environment {
        IMAGE_NAME = "alpinehelloworld"
        IMAGE_TAG = "latest"
-       STAGING = "stephanetecher-staging"
-       PRODUCTION = "stephanetecher-production"
+       STAGING = "StephaneInfo-staging"
+       PRODUCTION = "StephaneInfo-production"
      }
      agent none
      stages {
@@ -11,7 +11,7 @@ pipeline {
              agent any
              steps {
                 script {
-                  sh 'docker build -t stephanetecher/$IMAGE_NAME:$IMAGE_TAG .'
+                  sh 'docker build -t StephaneInfo/$IMAGE_NAME:$IMAGE_TAG .'
                 }
              }
         }
@@ -20,7 +20,7 @@ pipeline {
             steps {
                script {
                  sh '''
-                    docker run --name $IMAGE_NAME -d -p 80:5000 -e PORT=5000 stephanetecher/$IMAGE_NAME:$IMAGE_TAG
+                    docker run --name $IMAGE_NAME -d -p 80:5000 -e PORT=5000 StephaneInfo/$IMAGE_NAME:$IMAGE_TAG
                     sleep 5
                  '''
                }
@@ -53,7 +53,7 @@ pipeline {
             }
       agent any
       environment {
-          HEROKU_API_KEY = credentials('Key_Heroku')
+          HEROKU_API_KEY = credentials('Key_heroku')
       }  
       steps {
           script {
@@ -72,7 +72,7 @@ pipeline {
             }
       agent any
       environment {
-          HEROKU_API_KEY = credentials('Key_Heroku')
+          HEROKU_API_KEY = credentials('Key_heroku')
       }  
       steps {
           script {
