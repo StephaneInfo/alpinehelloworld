@@ -4,6 +4,7 @@ pipeline {
        IMAGE_TAG = "latest"
        STAGING = "stephaneinfo-staging"
        PRODUCTION = "stephaneinfo-production"
+       DOCKER_CREDS = credentials('FDP_DockerHub')
      }
      agent none
      stages {
@@ -35,6 +36,17 @@ pipeline {
                 '''
               }
            }
+      }
+      stage ('Login and Push Image on docker hub') {
+          agent any
+          steps {
+             script {
+               sh '''
+                   echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
+                   docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
+               '''
+             }
+          }
       }
       stage('Clean Container') {
           agent any
