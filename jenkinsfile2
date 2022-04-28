@@ -8,7 +8,7 @@ pipeline {
      }
      agent none
      stages {
-         stage('Build image') {
+        stage('Build image') {
              agent any
              steps {
                 script {
@@ -36,12 +36,12 @@ pipeline {
                 '''
               }
            }
-      }
+        }
       stage ('Login and Push Image on docker hub') {
           agent any
           steps {
              script {
-               docker.withRegistry( '', DOCKER_CREDS ) {
+               docker.withRegistry( '', DOCKER_CREDS ) 
                dockerImage.push($IMAGE_TAG)
              }
           }
