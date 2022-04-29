@@ -1,0 +1,64 @@
+pipeline {
+     environment {
+       IMAGE_NAME = "staticWebsite"
+       IMAGE_TAG = "V1.0"
+       STAGING = "stephaneinfo-staging"
+       PRODUCTION = "stephaneinfo-production"
+       DOCKER_CREDS = credentials('FDP_DockerHub')
+     }
+     agent none
+     stages {
+         stage('Build image') {
+             agent any
+             steps {
+                script {
+                  sh 'docker build -t stephaneinfo/$IMAGE_NAME:$IMAGE_TAG .'
+                }
+             }
+        }
+        stage('Run container based on builded image') {
+            agent any
+            steps {
+               script {
+                 sh '''
+                    docker run --name $IMAGE_NAME -d -p 80:5000 -e PORT=80 stephaneinfo/$IMAGE_NAME:$IMAGE_TAG
+                    sleep 5
+                 '''
+               }
+            }
+       }
+       stage('Test image') {
+           agent any
+           steps {
+              script {
+                sh '''
+                    curl http://172.17.0.1 | grep -q "A fully responsive site template designed by"
+                '''
+              }
+           }
+      }
+      stage ('Login and Push Image on docker hub') {
+          agent any
+          steps {
+             script {
+               sh '''
+                   echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
+                   docker push ${DOCKER_CREDS_USR}/$IMAGE_NAME:$IMAGE_TAG
+               '''
+             }
+          }
+      }
+      stage('Clean Container') {
+          agent any
+          steps {
+             script {
+               sh '''
+                 docker stop $IMAGE_NAME
+                 docker rm $IMAGE_NAME
+               '''
+             }
+          }
+     }
+
+  }
+}
